@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+        <title>Crop Recommendation System</title>
+    </head>
+
+    <body>
+        
+<div class="container mt-5">
+    <div class="row ">
+        <div class="col-md-10 mx-auto">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="text-center">Enter Sensors Data</h3>
+                        </div>
+                        <div class="card-body">
+                            <form action="">
+                                <div class="row form-group">
+                                    <div class="col-md-4">Temperature:</div>
+                                    <div class="col-md-8">
+                                        <input type="number" min="0" max="50" id="temperature" class="form-control" placeholder="Enter value from 0-100">
+                                    </div>
+                                </div>
+                                 <div class="row form-group">
+                                    <div class="col-md-4">Humidity:</div>
+                                    <div class="col-md-8">
+                                        <input type="number" min="10" max="120" id="humidity" class="form-control" placeholder="Enter value from 10-150">
+                                    </div>
+                                </div>
+                                 <div class="row form-group">
+                                    <div class="col-md-4">Rainfall:</div>
+                                    <div class="col-md-8">
+                                        <input type="number" min="0" max="250" id="rainfall" class="form-control" placeholder="Enter value from 0-300">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-8">
+                                        <input type="button" id="predict-btn" class="btn btn-success btn-block" value="Predict Crops">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-primary px-4">
+                        Your recommended crop will apear here:
+                    </h5>
+                    <p class="text-center p-5 text-success m-3" style="border:2px solid green;">
+                        <strong style="font-size:30px;" id="output" class="text-capitalize">None</strong>
+                    </p>
+                        
+                </div
+            </div>
+        </div>
+    </div>
+</div>
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+        <script async>
+
+            async function runModel(temp,hum,rain)
+            {   
+                var data=[Number(temp), Number(hum), Number(rain)]
+                const model = await tf.loadLayersModel("ml/model.json");
+                let input = tf.tensor2d(data, [1, 3])
+                let output = model.predict(input)
+                
+                var crops=["rice","maize","chickpea","kidneybeans","pigeonpeas","mothbeans","mungbean","blackgram","lentil","pomegranate","banana","mango","grapes","watermelon","muskmelon","apple","orange","papaya","coconut","cotton","jute","coffee"]
+                var index=Math.round(output.arraySync()[0][0])
+                if(index<0 || index >21){
+                    alert("Incompatible sensors data")
+                }else{
+                    document.querySelector("#output").innerHTML=crops[index]
+                    console.log(index)
+                }
+                
+                 
+            }
+           
+           $(document).ready(function(){
+              $("#predict-btn").click(function(){
+                let  temperature=document.querySelector("#temperature").value
+                let  humidity=document.querySelector("#humidity").value
+                let  rainfall=document.querySelector("#rainfall").value 
+                if(temperature.length==0 || humidity.length==0 ||rainfall.length==0){
+                    alert("PLease provide reasonable value")
+                }else{
+                    runModel(temperature,humidity,rainfall)
+                }
+                
+
+              })
+           })
+
+        </script>
+        
+    </body>
+
+</html>
